@@ -14,8 +14,6 @@ import monitoredPlantRoutes from "./routes/monitoredPlantRoutes.js";
 import rescueRoutes from "./routes/rescueRoutes.js";
 import requestRoutes from "./routes/requestRoutes.js";
 import ChatMessage from "./models/ChatMessage.js";
-import productRoutes from "./routes/productRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
 
 /* ── CONNECT DATABASE ── */
 connectDB();
@@ -58,8 +56,6 @@ app.use("/api/rescue", rescueRoutes);
 app.use("/api/requests", requestRoutes);
 
 /* ── OTHER ROUTES ── */
-app.use("/api/products", productRoutes);
-app.use("/api/upload", uploadRoutes);
 
 /* ── AI CHAT ROUTE ── */
 app.post("/api/chat", async (req, res) => {
