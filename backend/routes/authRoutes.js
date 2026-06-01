@@ -135,70 +135,51 @@ router.post("/verify-otp", async (req, res) => {
   }
 });
 
-/* LOGIN */
+/* LOGIN (Send OTP) */
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
     }
 
     /* FIND USER */
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(400).json({ success: false, message: "User not found. Please register first." });
     }
 
-    /* CHECK PASSWORD */
-    const isMatch = await bcrypt.compare(password, user.password);
+    /* GENERATE OTP */
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid password",
+    /* SAVE OTP */
+    await OTP.create({ email, otp: otpCode });
+
+    /* SEND OTP EMAIL */
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      await transporter.sendMail({
+        from: process.env.EMAIL_USER,
+        to: email,
+        subject: "PlantAI Login Code",
+        html: `<h2>Login to PlantAI 🌿</h2>
+               <p>Your 6-digit login code is:</p>
+               <h1 style="color: green; font-size: 32px;">${otpCode}</h1>
+               <p>This code will expire in 5 minutes.</p>`,
       });
+      console.log("Login OTP sent to:", email);
+    } else {
+      console.log("\n=============================");
+      console.log("MOCK OTP (Login)");
+      console.log(`To: ${email} | OTP: ${otpCode}`);
+      console.log("=============================\n");
     }
 
-    /* CHECK VERIFICATION */
-    if (!user.isVerified) {
-      return res.status(403).json({
-        success: false,
-        message: "Please verify your email to log in. You can register again to get a new code.",
-      });
-    }
-
-    /* TOKEN */
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.json({
-      success: true,
-      message: "Login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      },
-    });
+    res.json({ success: true, message: "OTP sent to your email. Please verify." });
   } catch (error) {
     console.error("Login error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Login failed",
-    });
+    res.status(500).json({ success: false, message: "Failed to send login code" });
   }
 });
 

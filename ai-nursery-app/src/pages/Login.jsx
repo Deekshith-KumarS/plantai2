@@ -7,17 +7,20 @@ import GoogleSignInButton from "../components/GoogleSignInButton";
 export default function Login() {
   const navigate = useNavigate();
 
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleRequestOtp = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccessMsg("");
 
-    if (!email || !password) {
-      setError("Please enter email and password");
+    if (!email) {
+      setError("Please enter your email");
       return;
     }
 
@@ -27,7 +30,41 @@ export default function Login() {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setSuccessMsg(data.message);
+        setStep(2);
+      } else {
+        setError(data.message || "Failed to send code");
+      }
+    } catch (err) {
+      setError("Server error. Please make sure the backend is running.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMsg("");
+
+    if (!otp) {
+      setError("Please enter the 6-digit code");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
       });
 
       const data = await response.json();
@@ -37,7 +74,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate("/dashboard");
       } else {
-        setError(data.message || "Login failed");
+        setError(data.message || "Invalid code");
       }
     } catch (err) {
       setError("Server error. Please make sure the backend is running.");
@@ -95,67 +132,89 @@ export default function Login() {
             </p>
           </div>
 
-          {/* ERROR */}
+          {/* ERROR / SUCCESS */}
           {error && (
             <div className="mt-6 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-2xl text-base">
               ⚠️ {error}
             </div>
           )}
-
-          {/* GOOGLE SIGN-IN */}
-          <div className="mt-8">
-            <GoogleSignInButton label="Sign in with Google" />
-          </div>
-
-          {/* OR DIVIDER */}
-          <div className="flex items-center gap-4 mt-6">
-            <div className="flex-1 h-px bg-gray-200"></div>
-            <span className="text-gray-400 text-sm font-medium">OR</span>
-            <div className="flex-1 h-px bg-gray-200"></div>
-          </div>
-
-          {/* FORM */}
-          <form onSubmit={handleLogin} className="mt-6">
-
-            {/* EMAIL */}
-            <div>
-              <label className="text-lg font-semibold text-gray-700">Email Address</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full mt-2 px-6 py-4 rounded-2xl border border-gray-200 outline-none focus:border-green-600 text-lg shadow-sm"
-              />
+          {successMsg && (
+            <div className="mt-6 bg-green-50 border border-green-200 text-green-800 px-5 py-4 rounded-2xl text-base">
+              ✅ {successMsg}
             </div>
+          )}
 
-            {/* PASSWORD */}
-            <div className="mt-5">
-              <div className="flex justify-between items-center">
-                <label className="text-lg font-semibold text-gray-700">Password</label>
-                <Link to="/forgot-password" className="text-sm font-bold text-green-700 hover:underline">
-                  Forgot Password?
-                </Link>
+          {step === 1 ? (
+            <>
+              {/* GOOGLE SIGN-IN */}
+              <div className="mt-8">
+                <GoogleSignInButton label="Sign in with Google" />
               </div>
+
+              {/* OR DIVIDER */}
+              <div className="flex items-center gap-4 mt-6">
+                <div className="flex-1 h-px bg-gray-200"></div>
+                <span className="text-gray-400 text-sm font-medium">OR</span>
+                <div className="flex-1 h-px bg-gray-200"></div>
+              </div>
+
+              {/* FORM */}
+              <form onSubmit={handleRequestOtp} className="mt-6">
+
+                {/* EMAIL */}
+                <div>
+                  <label className="text-lg font-semibold text-gray-700">Email Address</label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full mt-2 px-6 py-4 rounded-2xl border border-gray-200 outline-none focus:border-green-600 text-lg shadow-sm"
+                  />
+                </div>
+
+                {/* LOGIN BUTTON */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-green-700 to-green-500 text-white py-5 rounded-2xl mt-8 hover:scale-[1.02] transition duration-300 text-2xl font-bold shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? "Sending Code..." : "Continue with Email"}
+                </button>
+
+              </form>
+            </>
+          ) : (
+            <form onSubmit={handleVerifyOtp} className="mt-8">
+              <label className="text-lg font-semibold text-gray-700">Enter Login Code</label>
+              <p className="text-gray-500 text-sm mt-1 mb-4">We sent a 6-digit code to <span className="font-bold">{email}</span></p>
+              
               <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full mt-2 px-6 py-4 rounded-2xl border border-gray-200 outline-none focus:border-green-600 text-lg shadow-sm"
+                type="text"
+                maxLength="6"
+                placeholder="000000"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                className="w-full text-center tracking-[1em] font-mono text-3xl px-6 py-5 rounded-2xl border border-gray-200 outline-none focus:border-green-600 shadow-sm"
               />
-            </div>
 
-            {/* LOGIN BUTTON */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-green-700 to-green-500 text-white py-5 rounded-2xl mt-8 hover:scale-[1.02] transition duration-300 text-2xl font-bold shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {loading ? "Logging in..." : "Login"}
-            </button>
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="w-full bg-gradient-to-r from-green-700 to-green-500 text-white py-5 rounded-2xl mt-8 hover:scale-[1.02] transition duration-300 text-2xl font-bold shadow-xl disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? "Verifying..." : "Verify & Login"}
+              </button>
 
-          </form>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-full mt-4 text-gray-500 hover:text-green-700 font-semibold transition"
+              >
+                ← Back to Email
+              </button>
+            </form>
+          )}
 
           {/* REGISTER LINK */}
           <p className="text-center text-gray-500 mt-6 text-lg">
