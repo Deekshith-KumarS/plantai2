@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
 const router = express.Router();
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "195325415108-qjlqr5oi3ha09b5ddkdngjt04fa8430q.apps.googleusercontent.com";
+const googleClient = new OAuth2Client(CLIENT_ID);
 
 /* ── GOOGLE SIGN-IN ── */
 router.post("/google", async (req, res) => {
@@ -18,7 +19,7 @@ router.post("/google", async (req, res) => {
     // Verify the Google token
     const ticket = await googleClient.verifyIdToken({
       idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -77,7 +78,7 @@ router.post("/google", async (req, res) => {
       return res.status(401).json({ success: false, message: "Google token expired. Please try again." });
     }
 
-    res.status(401).json({ success: false, message: "Google sign-in failed. Invalid token." });
+    res.status(401).json({ success: false, message: `Google sign-in failed: ${error.message}` });
   }
 });
 
