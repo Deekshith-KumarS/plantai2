@@ -81,10 +81,9 @@ router.post("/register", async (req, res) => {
       message: "OTP sent to email. Please verify.",
     });
   } catch (error) {
-    console.error("Register error:", error.message);
     res.status(500).json({
       success: false,
-      message: "Registration failed",
+      message: `Registration failed: ${error.message}`,
     });
   }
 });
@@ -179,7 +178,7 @@ router.post("/login", async (req, res) => {
     res.json({ success: true, message: "OTP sent to your email. Please verify." });
   } catch (error) {
     console.error("Login error:", error.message);
-    res.status(500).json({ success: false, message: "Failed to send login code" });
+    res.status(500).json({ success: false, message: `Failed to send login code: ${error.message}` });
   }
 });
 
