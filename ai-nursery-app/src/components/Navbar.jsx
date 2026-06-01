@@ -34,7 +34,7 @@ export default function Navbar() {
   };
 
   const navStyle = ({ isActive }) =>
-    `px-4 py-2 rounded-xl transition font-semibold whitespace-nowrap ${
+    `px-3 py-1.5 text-sm rounded-xl transition font-semibold whitespace-nowrap ${
       isActive
         ? "bg-green-700 text-white shadow-md"
         : "text-gray-600 hover:bg-green-50 hover:text-green-700"
@@ -61,7 +61,7 @@ export default function Navbar() {
           </div>
 
           {/* DESKTOP MENU */}
-          <div className="hidden lg:flex flex-1 items-center justify-center space-x-2">
+          <div className="hidden xl:flex flex-1 items-center justify-center gap-1 overflow-x-auto px-2 mx-2">
             <NavLink to="/dashboard" className={navStyle}>Dashboard</NavLink>
             <NavLink to="/shop" className={navStyle}>Explore</NavLink>
             <NavLink to="/wishlist" className={navStyle}>Wishlist</NavLink>
@@ -71,7 +71,7 @@ export default function Navbar() {
             <NavLink to="/monitor" className={navStyle}>Smart Monitor</NavLink>
             
             <NavLink to="/rescue/dashboard" className={({ isActive }) =>
-              `relative px-4 py-2 rounded-xl transition font-semibold whitespace-nowrap flex items-center gap-1 ${
+              `relative px-3 py-1.5 text-sm rounded-xl transition font-semibold whitespace-nowrap flex items-center gap-1 ${
                 isActive
                   ? "bg-green-700 text-white shadow-md"
                   : "text-gray-600 hover:bg-green-50 hover:text-green-700"
@@ -79,7 +79,7 @@ export default function Navbar() {
             }>
               My Rescues
               {rescueNotifications > 0 && (
-                <span className="bg-amber-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
+                <span className="bg-amber-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center animate-bounce">
                   {rescueNotifications}
                 </span>
               )}
@@ -95,25 +95,25 @@ export default function Navbar() {
           </div>
 
           {/* RIGHT DESKTOP & MOBILE CART/LOGOUT */}
-          <div className="hidden lg:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-2">
             <NavLink to="/cart" className={({ isActive }) =>
-              `relative p-3 rounded-full transition ${isActive ? "bg-green-100 text-green-700" : "text-gray-600 hover:bg-gray-100"}`
+              `relative p-2 rounded-full transition ${isActive ? "bg-green-100 text-green-700" : "text-gray-600 hover:bg-gray-100"}`
             }>
-              <ShoppingCart className="w-6 h-6" />
+              <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-white shadow-sm">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center border-2 border-white shadow-sm">
                   {cartCount > 9 ? "9+" : cartCount}
                 </span>
               )}
             </NavLink>
 
-            <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-5 py-2.5 rounded-xl font-bold transition">
+            <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-4 py-2 rounded-xl text-sm font-bold transition">
               <LogOut className="w-4 h-4" /> Logout
             </button>
           </div>
 
           {/* MOBILE MENU BUTTON & CART */}
-          <div className="flex items-center gap-4 lg:hidden">
+          <div className="flex items-center gap-4 xl:hidden">
             <NavLink to="/cart" className="relative p-2 text-gray-600">
               <ShoppingCart className="w-7 h-7" />
               {cartCount > 0 && (
@@ -135,7 +135,7 @@ export default function Navbar() {
 
       {/* MOBILE MENU DROPDOWN */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-gray-100 absolute w-full shadow-2xl z-40 overflow-hidden">
+        <div className="xl:hidden bg-white border-b border-gray-100 absolute w-full shadow-2xl z-40 overflow-hidden">
           <div className="px-4 pt-4 pb-6 space-y-3 max-h-[80vh] overflow-y-auto">
             <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={mobileNavStyle}>Dashboard</NavLink>
             <NavLink to="/shop" onClick={() => setMobileMenuOpen(false)} className={mobileNavStyle}>Explore Plants</NavLink>
