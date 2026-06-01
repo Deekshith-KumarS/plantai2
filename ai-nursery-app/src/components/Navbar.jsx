@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
-import { Menu, X, ShoppingCart, LogOut, Bell } from "lucide-react";
+import { Menu, X, ShoppingCart, LogOut, Bell, ChevronDown } from "lucide-react";
 import { API_URL } from "../config";
 
 export default function Navbar() {
@@ -86,11 +86,20 @@ export default function Navbar() {
             </NavLink>
             
             {user?.isAdmin && (
-              <>
-                <NavLink to="/admin" className={navStyle}>Admin</NavLink>
-                <NavLink to="/delivery-hub" className={navStyle}>Delivery Hub</NavLink>
-                <NavLink to="/admin/rescue" className={navStyle}>Rescue Mod</NavLink>
-              </>
+              <div className="relative group">
+                <button className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded-xl transition font-semibold whitespace-nowrap text-gray-600 hover:bg-green-50 hover:text-green-700`}>
+                  Admin <ChevronDown className="w-4 h-4" />
+                </button>
+                
+                {/* DROPDOWN PANEL */}
+                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 w-48">
+                  <div className="bg-white border border-gray-100 rounded-2xl shadow-xl p-2 space-y-1">
+                    <NavLink to="/admin" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Admin Panel</NavLink>
+                    <NavLink to="/delivery-hub" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Delivery Hub</NavLink>
+                    <NavLink to="/admin/rescue" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Rescue Mod</NavLink>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
