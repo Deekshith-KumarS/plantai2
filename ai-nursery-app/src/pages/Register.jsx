@@ -9,7 +9,6 @@ export default function Register() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   
   const [loading, setLoading] = useState(false);
@@ -20,8 +19,8 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (!name || !email || !password) {
-      setError("Please fill in all fields");
+    if (!name || !email) {
+      setError("Please fill in your name and email");
       return;
     }
 
@@ -31,7 +30,7 @@ export default function Register() {
       const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email }),
       });
 
       const data = await response.json();
@@ -177,18 +176,6 @@ export default function Register() {
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full mt-2 px-6 py-4 rounded-2xl border border-gray-200 outline-none focus:border-green-600 text-lg shadow-sm"
-                  />
-                </div>
-
-                {/* PASSWORD */}
-                <div className="mt-5">
-                  <label className="text-lg font-semibold text-gray-700">Password</label>
-                  <input
-                    type="password"
-                    placeholder="Create a password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full mt-2 px-6 py-4 rounded-2xl border border-gray-200 outline-none focus:border-green-600 text-lg shadow-sm"
                   />
                 </div>

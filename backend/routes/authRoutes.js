@@ -20,12 +20,12 @@ const transporter = nodemailer.createTransport({
 /* REGISTER */
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "Name and email are required",
       });
     }
 
@@ -39,19 +39,14 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    /* HASH PASSWORD */
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     /* CREATE OR UPDATE USER (Unverified) */
     if (user) {
-      user.password = hashedPassword;
       user.name = name;
       await user.save();
     } else {
       user = await User.create({
         name,
         email,
-        password: hashedPassword,
         isVerified: false,
       });
     }
