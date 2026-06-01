@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
-import { Menu, X, ShoppingCart, LogOut, Bell, ChevronDown } from "lucide-react";
+import { Menu, X, ShoppingCart, LogOut, Bell, MoreVertical } from "lucide-react";
 import { API_URL } from "../config";
 
 export default function Navbar() {
@@ -9,6 +9,7 @@ export default function Navbar() {
   const { cartCount } = useContext(CartContext);
   const user = JSON.parse(localStorage.getItem("user"));
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const [rescueNotifications, setRescueNotifications] = useState(0);
 
   useEffect(() => {
@@ -85,22 +86,6 @@ export default function Navbar() {
               )}
             </NavLink>
             
-            {user?.isAdmin && (
-              <div className="relative group">
-                <button className={`flex items-center gap-1 px-3 py-1.5 text-sm rounded-xl transition font-semibold whitespace-nowrap text-gray-600 hover:bg-green-50 hover:text-green-700`}>
-                  Admin <ChevronDown className="w-4 h-4" />
-                </button>
-                
-                {/* DROPDOWN PANEL */}
-                <div className="absolute right-0 top-full pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 w-48">
-                  <div className="bg-white border border-gray-100 rounded-2xl shadow-xl p-2 space-y-1">
-                    <NavLink to="/admin" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Admin Panel</NavLink>
-                    <NavLink to="/delivery-hub" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Delivery Hub</NavLink>
-                    <NavLink to="/admin/rescue" className={({ isActive }) => `block px-4 py-2 text-sm rounded-xl transition font-semibold ${isActive ? "bg-green-100 text-green-700" : "text-gray-700 hover:bg-green-50 hover:text-green-700"}`}>Rescue Mod</NavLink>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* RIGHT DESKTOP & MOBILE CART/LOGOUT */}
@@ -115,6 +100,36 @@ export default function Navbar() {
                 </span>
               )}
             </NavLink>
+
+            {/* ADMIN DROPDOWN ON RIGHT */}
+            {user?.isAdmin && (
+              <div className="relative">
+                <button 
+                  onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
+                  className={`flex items-center gap-1 px-4 py-2 rounded-xl text-sm font-bold transition ${adminDropdownOpen ? "bg-green-100 text-green-800" : "bg-gray-50 text-gray-700 hover:bg-gray-100"}`}
+                >
+                  Admin <MoreVertical className="w-4 h-4" />
+                </button>
+                
+                {adminDropdownOpen && (
+                  <>
+                    {/* INVISIBLE OVERLAY TO CLOSE ON CLICK OUTSIDE */}
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setAdminDropdownOpen(false)}
+                    ></div>
+                    
+                    <div className="absolute right-0 top-full mt-3 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden">
+                      <div className="p-2 space-y-1">
+                        <NavLink onClick={() => setAdminDropdownOpen(false)} to="/admin" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl font-bold">Admin Panel</NavLink>
+                        <NavLink onClick={() => setAdminDropdownOpen(false)} to="/delivery-hub" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl font-bold">Delivery Hub</NavLink>
+                        <NavLink onClick={() => setAdminDropdownOpen(false)} to="/admin/rescue" className="block px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-xl font-bold">Rescue Mod</NavLink>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
 
             <button onClick={handleLogout} className="flex items-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-4 py-2 rounded-xl text-sm font-bold transition">
               <LogOut className="w-4 h-4" /> Logout
